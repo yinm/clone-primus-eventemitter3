@@ -128,3 +128,29 @@ EventEmitter.prototype.eventNames = function () {
 
   return names
 }
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @returns {Array} The registered listeners.
+ * @public
+ */
+EventEmitter.prototype.listeners = function(event) {
+  const evt = prefix ? prefix + event : event
+  const handlers = this._events[evt]
+
+  if (!handlers) {
+    return []
+  }
+
+  if (handlers.fn) {
+    return [handlers.fn]
+  }
+
+  for (let i = 0, l = handlers.length, ee = new Array(l); i < l; i++) {
+    ee[i] = handlers[i].fn
+  }
+
+  return ee
+}
