@@ -89,3 +89,15 @@ function clearEvent(emitter, evt) {
     delete emitter._events[evt]
   }
 }
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @public
+ */
+function EventEmitter() {
+  this._events = new Events()
+  this._eventsCount = 0
+}
