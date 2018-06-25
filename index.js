@@ -101,3 +101,30 @@ function EventEmitter() {
   this._events = new Events()
   this._eventsCount = 0
 }
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @public
+ */
+EventEmitter.prototype.eventNames = function () {
+  let names = []
+  let events
+  let name
+
+  if (this._eventsCount === 0) return names
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) {
+      names.push(prefix ? name.slice[1] : name)
+    }
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events))
+  }
+
+  return names
+}
