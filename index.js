@@ -44,3 +44,33 @@ function EE(fn, context, once) {
   this.once = once || false
 }
 
+/**
+ * Add a listener for a given event.
+ *
+ * @param {EventEmitter} emitter Reference to the `EventEmitter` instance.
+ * @param {(String|Symbol)} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {*} context The context to invoke the listener with.
+ * @param {Boolean} once Specify if the listener is a one-time listener.
+ * @returns {EventEmitter}
+ * @private
+ */
+function addListener(emitter, event, fn, context, once) {
+  if (typeof fn !== 'function') {
+    throw new TypeError('The listener must be a function')
+  }
+
+  const listener = new EE(fn, context || emitter, once)
+  const evt = prefix ? prefix + event : event
+
+  if (!emitter._events[evt]) {
+    emitter._events[evt] = listener
+    emitter._eventsCount++
+  } else if (!emitter._events[evt].fn) {
+    emitter._events[evt].push(listener)
+  } else {
+    emitter._events[evt] = [emitter._events[evt], listener]
+  }
+
+  return emitter
+}
