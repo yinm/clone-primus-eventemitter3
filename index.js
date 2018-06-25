@@ -28,3 +28,19 @@ if (Object.create) {
    */
   if (!new Events().__proto__) prefix = false
 }
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {*} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @private
+ */
+function EE(fn, context, once) {
+  this.fn = fn
+  this.context = context
+  this.once = once || false
+}
+
