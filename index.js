@@ -74,3 +74,18 @@ function addListener(emitter, event, fn, context, once) {
 
   return emitter
 }
+
+/**
+ * Clear event by name.
+ *
+ * @param {EventEmitter} emitter Reference to the `EventEmitter` instance.
+ * @param {(String|Symbol)} evt The Event name.
+ * @private
+ */
+function clearEvent(emitter, evt) {
+  if (--emitter._eventsCount === 0) {
+    emitter._events = new Events()
+  } else {
+    delete emitter._events[evt]
+  }
+}
