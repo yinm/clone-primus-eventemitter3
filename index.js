@@ -176,3 +176,63 @@ EventEmitter.prototype.listenerCount = function(event) {
 
   return listeners.length
 }
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @returns {boolean} `true` if the event had listeners, else `false`.
+ * @public
+ */
+EventEmitter.prototype.emit = function(event, a1, a2, a3, a4, a5) {
+  const evt = prefix ? prefix + event : event
+
+  if (!this._events[evt]) return false
+
+  const listeners = this._events[evt]
+  let len = arguments.length
+  let args
+  let i
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true)
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true
+      case 2: return listeners.fn.call(listeners.context, a1), true
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true
+    }
+
+    for (i = 1, args = new Array(len - 1); i < len; i++) {
+      args[i - 1] = arguments[i]
+    }
+
+    listeners.fn.apply(listeners.context, args)
+
+  } else {
+    let length = listeners.length
+    let j
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true)
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break
+        default:
+          if (!args) for (j = 1, args = new Array(len - 1); j < len; j++) {
+            args[j - 1] = arguments[j]
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args)
+      }
+    }
+  }
+
+  return true
+}
