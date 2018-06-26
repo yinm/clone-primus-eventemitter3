@@ -263,3 +263,52 @@ EventEmitter.prototype.once = function(event, fn, context) {
   return addEventListener(this, event, fn, context, true)
 }
 
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {*} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @public
+ */
+EventEmitter.prototype.removeListener = function(event, fn, context, once) {
+  const evt = prefix ? prefix + event : event
+
+  if (!this._events[evt]) return this
+
+  if (!fn) {
+    clearEvent(this, evt)
+    return this
+  }
+
+  let listeners = this._events[evt]
+
+  if (listeners.fn) {
+    if (
+      listeners.fn === fn &&
+      (!once || listeners.once) &&
+      (!context || listeners.context === context)
+    ) {
+      clearEvent(this, evt)
+    }
+  } else {
+    let events = []
+    for (let i = 0, length = listeners.length; i < length; i++) {
+      if (
+        listeners[i].fn !== fn ||
+        (once && !listeners[i].once) ||
+        (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i])
+      }
+    }
+
+    // Reset the array, or remove it completely if we have no more listeners.
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events
+    else clearEvent(this, evt)
+  }
+
+  return this
+}
