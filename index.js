@@ -249,3 +249,17 @@ EventEmitter.prototype.emit = function(event, a1, a2, a3, a4, a5) {
 EventEmitter.prototype.on = function(event, fn, context) {
   return addEventListener(this, event, fn, context, false)
 }
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {*} [context=this] The context to invoke the listener with.
+ * @return {EventEmitter} `this`.
+ * @public
+ */
+EventEmitter.prototype.once = function(event, fn, context) {
+  return addEventListener(this, event, fn, context, true)
+}
+
