@@ -332,3 +332,18 @@ EventEmitter.prototype.removeAllListeners = function(event) {
 
   return this
 }
+
+// Alias methods names because people roll like that.
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener
+EventEmitter.prototype.addListener = EventEmitter.prototype.on
+
+// Expose the prefix.
+EventEmitter.prefixed = prefix
+
+// Allow `EventEmitter` to be imported as module namespace.
+EventEmitter.EventEmitter = EventEmitter
+
+// Expose the module.
+if ('undefined' !== typeof module) {
+  module.exports = EventEmitter
+}
