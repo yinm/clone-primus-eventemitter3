@@ -312,3 +312,23 @@ EventEmitter.prototype.removeListener = function(event, fn, context, once) {
 
   return this
 }
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {(String|Symbol)} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @public
+ */
+EventEmitter.prototype.removeAllListeners = function(event) {
+  const evt = prefix ? prefix + event : event
+
+  if (event) {
+    if (this._events[evt]) clearEvent(this, evt)
+  } else {
+    this._events = new Events()
+    this._eventsCount = 0
+  }
+
+  return this
+}
