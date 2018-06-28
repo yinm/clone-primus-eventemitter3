@@ -169,6 +169,23 @@ describe('EventEmitter', () => {
       e.emit('foo', 'bar')
     })
 
+    it('emits with different contexts', () => {
+      let e = new EventEmitter()
+      let pattern = ''
+
+      function writer() {
+        pattern += this
+      }
+
+      e.on('write', writer, 'foo')
+      e.on('write', writer, 'baz')
+      e.once('write', writer, 'bar')
+      e.once('write', writer, 'banana')
+
+      e.emit('write')
+      assume(pattern).equals('foobazbarbanana')
+    })
+
   })
 
 })
