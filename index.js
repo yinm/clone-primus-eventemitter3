@@ -148,7 +148,9 @@ EventEmitter.prototype.listeners = function(event) {
     return [handlers.fn]
   }
 
-  for (let i = 0, l = handlers.length, ee = new Array(l); i < l; i++) {
+  let l = handlers.length
+  let ee = new Array(l)
+  for (let i = 0; i < l; i++) {
     ee[i] = handlers[i].fn
   }
 
@@ -247,7 +249,7 @@ EventEmitter.prototype.emit = function(event, a1, a2, a3, a4, a5) {
  * @public
  */
 EventEmitter.prototype.on = function(event, fn, context) {
-  return addEventListener(this, event, fn, context, false)
+  return addListener(this, event, fn, context, false)
 }
 
 /**
@@ -260,7 +262,7 @@ EventEmitter.prototype.on = function(event, fn, context) {
  * @public
  */
 EventEmitter.prototype.once = function(event, fn, context) {
-  return addEventListener(this, event, fn, context, true)
+  return addListener(this, event, fn, context, true)
 }
 
 /**
