@@ -79,6 +79,19 @@ describe('EventEmitter', () => {
       assume(e.emit('foo')).equals(false)
       assume(e.emit('bar')).equals(false)
     })
+
+    it('emits with context', (done) => {
+      const context = { bar: 'baz' }
+      let e = new EventEmitter()
+
+      e.on('foo', function(bar) {
+        assume(bar).equals('bar')
+        assume(this).equals(context)
+
+        done()
+      }, context).emit('foo', 'bar')
+    })
+
   })
 
 })
