@@ -104,6 +104,25 @@ describe('EventEmitter', () => {
       }, context).emit('foo', 'bar', 1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
     })
 
+    it('can emit the function with multiple arguments', () => {
+      let e = new EventEmitter()
+
+      for (let i = 0; i < 100; i++) {
+        (function(j) {
+          let args = []
+          for (let k = 0; k < j; k++) {
+            args.push(j)
+          }
+
+          e.once('args', function() {
+            assume(arguments.length).equals(args.length)
+          })
+
+          e.emit.apply(e, ['args'].concat(args))
+        })(i)
+      }
+    })
+
   })
 
 })
