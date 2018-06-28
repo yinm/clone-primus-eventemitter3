@@ -153,6 +153,22 @@ describe('EventEmitter', () => {
       }
     })
 
+    it('emits with context, multiple listeners (force loop)', () => {
+      let e = new EventEmitter()
+
+      e.on('foo', function(bar) {
+        assume(this).eqls({ foo: 'bar' })
+        assume(bar).equals('bar')
+      }, { foo: 'bar' })
+
+      e.on('foo', function(bar) {
+        assume(this).eqls({ bar: 'baz' })
+        assume(bar).equals('bar')
+      }, { bar: 'baz' })
+
+      e.emit('foo', 'bar')
+    })
+
   })
 
 })
