@@ -72,4 +72,13 @@ describe('EventEmitter', () => {
     assume(e.emit(event, 'bar')).equals(true)
   })
 
+  describe('EventEmitter#emit', () => {
+    it('should return false when there are not events to emit', () => {
+      let e = new EventEmitter()
+
+      assume(e.emit('foo')).equals(false)
+      assume(e.emit('bar')).equals(false)
+    })
+  })
+
 })
