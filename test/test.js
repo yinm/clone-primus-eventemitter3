@@ -123,6 +123,36 @@ describe('EventEmitter', () => {
       }
     })
 
+    it('can emit the function with multiple arguments, multiple listeners', function () {
+      let e = new EventEmitter()
+
+      for (var i = 0; i < 100; i++) {
+        (function (j) {
+          for (var i = 0, args = []; i < j; i++) {
+            args.push(j)
+          }
+
+          e.once('args', function() {
+            assume(arguments.length).equals(args.length)
+          })
+
+          e.once('args', function() {
+            assume(arguments.length).equals(args.length)
+          })
+
+          e.once('args', function() {
+            assume(arguments.length).equals(args.length)
+          })
+
+          e.once('args', function() {
+            assume(arguments.length).equals(args.length)
+          })
+
+          e.emit.apply(e, ['args'].concat(args))
+        })(i)
+      }
+    })
+
   })
 
 })
