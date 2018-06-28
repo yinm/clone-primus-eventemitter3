@@ -37,4 +37,39 @@ describe('EventEmitter', () => {
     meap.removeAllListeners()
   })
 
+  if ('undefined' !== typeof Symbol) it('works with ES6 symbols', (next) => {
+    let e = new EventEmitter()
+    const event = Symbol('cows')
+    const unknown = Symbol('moo')
+
+    e.on(event, function foo(arg) {
+      assume(e.listenerCount(unknown)).equals(0)
+      assume(e.listeners(unknown)).deep.equals([])
+      assume(arg).equals('bar')
+
+      function bar(onced) {
+        assume(e.listenerCount(unknown)).equals(0)
+        assume(e.listeners(unknown)).deep.equals([])
+        assume(onced).equals('foo')
+        next()
+      }
+
+      e.once(unknown, bar)
+
+      assume(e.listenerCount(event)).equals(1)
+      assume(e.listeners(event)).deep.equals([foo])
+      assume(e.listenerCount(unknown)).equals(1)
+      assume(e.listeners(unknown)).deep.equals([bar])
+
+      e.removeListener(event)
+
+      assume(e.listenerCount(event)).equals(0)
+      assume(e.listeners(event)).deep.equals([])
+      assume(e.emit(unknown, 'foo')).equals(true)
+    })
+
+    assume(e.emit(unknown, 'bar')).equals(false)
+    assume(e.emit(event, 'bar')).equals(true)
+  })
+
 })
