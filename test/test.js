@@ -92,6 +92,18 @@ describe('EventEmitter', () => {
       }, context).emit('foo', 'bar')
     })
 
+    it('emits with context, multiple arguments (force apply)', (done) => {
+      const context = { bar: 'baz' }
+      let e = new EventEmitter()
+
+      e.on('foo', function(bar) {
+        assume(bar).equals('bar')
+        assume(this).equals(context)
+
+        done()
+      }, context).emit('foo', 'bar', 1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
+    })
+
   })
 
 })
