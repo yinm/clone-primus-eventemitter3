@@ -620,5 +620,18 @@ describe('EventEmitter', function tests() {
       assume(e.eventNames()).eql([])
     })
 
+    if ('undefined' !== typeof Symbol) it('includes ES6 symbols', () => {
+      let e = new EventEmitter()
+      let s = Symbol('s')
+
+      function foo() {}
+
+      e.on('foo', foo)
+      e.on(s, () => {})
+
+      assume(e.eventNames()).eql(['foo', s])
+      e.removeListener('foo', foo)
+      assume(e.eventNames()).eql([s])
+    })
   })
 });
