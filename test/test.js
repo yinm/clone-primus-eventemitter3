@@ -545,6 +545,24 @@ describe('EventEmitter', function tests() {
       assume(e.emit('aaa')).equals(false)
     })
 
+    it('just nukes the fuck out of everything', () => {
+      let e = new EventEmitter()
+
+      e.on('foo', () => { throw new Error('oops') })
+      e.on('foo', () => { throw new Error('oops') })
+      e.on('bar', () => { throw new Error('oops') })
+      e.on('aaa', () => { throw new Error('oops') })
+
+      assume(e.removeAllListeners()).equals(e)
+      assume(e.listeners('foo').length).equals(0)
+      assume(e.listeners('bar').length).equals(0)
+      assume(e.listeners('aaa').length).equals(0)
+      assume(e._eventsCount).equals(0)
+
+      assume(e.emit('foo')).equals(false)
+      assume(e.emit('bar')).equals(false)
+      assume(e.emit('aaa')).equals(false)
+    })
   })
 
 });
