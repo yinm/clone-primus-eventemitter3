@@ -393,4 +393,17 @@ describe('EventEmitter', function tests() {
     })
   })
 
+  describe('EventEmitter#removeListener', () => {
+    it('removes all listeners when the listener is not specified', () => {
+      let e = new EventEmitter()
+
+      e.on('foo', () => {})
+      e.on('foo', () => {})
+
+      assume(e.removeListener('foo')).equals(e)
+      assume(e.listeners('foo')).eql([])
+    })
+
+  })
+
 });
