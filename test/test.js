@@ -404,6 +404,234 @@ describe('EventEmitter', function tests() {
       assume(e.listeners('foo')).eql([])
     })
 
+    it('removes only the listeners matching the specified listener', () => {
+      let e = new EventEmitter()
+
+      function foo() {}
+      function bar() {}
+      function baz() {}
+
+      e.on('foo', foo)
+      e.on('bar', bar)
+      e.on('bar', baz)
+
+      assume(e.removeListener('foo', bar)).equals(e)
+      assume(e.listeners('bar')).eql([bar, baz])
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(2)
+
+      assume(e.removeListener('foo', foo)).equals(e)
+      assume(e.listeners('bar')).eql([bar, baz])
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('bar', bar)).equals(e)
+      assume(e.listeners('bar')).eql([baz])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('bar', baz)).equals(e)
+      assume(e.listeners('bar')).eql([])
+      assume(e._eventsCount).equals(0)
+
+      e.on('foo', foo)
+      e.on('foo', foo)
+      e.on('bar', bar)
+
+      assume(e.removeListener('foo', foo)).equals(e)
+      assume(e.listeners('bar')).eql([bar])
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(1)
+    })
+
+    it('removes only the once listeners when using the once flag', () => {
+      let e = new EventEmitter()
+
+      function foo() {}
+
+      e.on('foo', foo)
+
+      assume(e.removeListener('foo', () => {}, undefined, true)).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, undefined, true)).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo)).equals(e)
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(0)
+
+      e.once('foo', foo)
+      e.on('foo', foo)
+
+      assume(e.removeListener('foo', () => {}, undefined, true)).equals(e)
+      assume(e.listeners('foo')).eql([foo, foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, undefined, true)).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      e.once('foo', foo)
+
+      assume(e.removeListener('foo', foo)).equal(e)
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(0)
+    })
+
+    it('removes only the listeners matching the correct context', () => {
+      const context = { foo: 'bar' }
+      let e = new EventEmitter()
+
+      function foo() {}
+      function bar() {}
+
+      e.on('foo', foo, context)
+
+      assume(e.removeListener('foo', () => {}, context)).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, { baz: 'quux' })).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, context)).equals(e)
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(0)
+
+      e.on('foo', foo, context)
+      e.on('foo', bar)
+
+      assume(e.removeListener('foo', foo, { baz: 'quux' })).equals(e)
+      assume(e.listeners('foo')).eql([foo, bar])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, context)).equals(e)
+      assume(e.listeners('foo')).eql([bar])
+      assume(e._eventsCount).equals(1)
+
+      e.on('foo', bar, context)
+
+      assume(e.removeListener('foo', bar)).equals(e)
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(0)
+    })
   })
 
+  describe('EventEmitter#removeAllListeners', () => {
+    it('removes all events for the specified events', () => {
+      let e = new EventEmitter()
+
+      e.on('foo', () => { throw new Error('oops') })
+      e.on('foo', () => { throw new Error('oops') })
+      e.on('bar', () => { throw new Error('oops') })
+      e.on('aaa', () => { throw new Error('oops') })
+
+      assume(e.removeAllListeners('foo')).equals(e)
+      assume(e.listeners('foo').length).equals(0)
+      assume(e.listeners('bar').length).equals(1)
+      assume(e.listeners('aaa').length).equals(1)
+      assume(e._eventsCount).equals(2)
+
+      assume(e.removeAllListeners('bar')).equals(e)
+      assume(e._eventsCount).equals(1)
+      assume(e.removeAllListeners('aaa')).equals(e)
+      assume(e._eventsCount).equals(0)
+
+      assume(e.emit('foo')).equals(false)
+      assume(e.emit('bar')).equals(false)
+      assume(e.emit('aaa')).equals(false)
+    })
+
+    it('just nukes the fuck out of everything', () => {
+      let e = new EventEmitter()
+
+      e.on('foo', () => { throw new Error('oops') })
+      e.on('foo', () => { throw new Error('oops') })
+      e.on('bar', () => { throw new Error('oops') })
+      e.on('aaa', () => { throw new Error('oops') })
+
+      assume(e.removeAllListeners()).equals(e)
+      assume(e.listeners('foo').length).equals(0)
+      assume(e.listeners('bar').length).equals(0)
+      assume(e.listeners('aaa').length).equals(0)
+      assume(e._eventsCount).equals(0)
+
+      assume(e.emit('foo')).equals(false)
+      assume(e.emit('bar')).equals(false)
+      assume(e.emit('aaa')).equals(false)
+    })
+  })
+
+  describe('EventEmitter#eventNames', () => {
+    it('returns an empty array when there are no events', () => {
+      let e = new EventEmitter()
+
+      assume(e.eventNames()).eql([])
+
+      e.on('foo', () => {})
+      e.removeAllListeners('foo')
+
+      assume(e.eventNames()).eql([])
+    })
+
+    it('returns an array listing the events that have listeners', () => {
+      let e = new EventEmitter()
+      let original
+
+      function bar() {}
+
+      if (Object.getOwnPropertySymbols) {
+        /**
+         * Monkey patch `Object.getOwnPropertySymbols()` to increase coverage
+         * on Node.js > 0.10.
+         */
+        original = Object.getOwnPropertySymbols
+        Object.getOwnPropertySymbols = undefined
+      }
+
+      e.on('foo', () => {})
+      e.on('bar', bar)
+
+      try {
+        assume(e.eventNames()).eql(['foo', 'bar'])
+        e.removeListener('bar', bar)
+        assume(e.eventNames()).eql(['foo'])
+      } catch (ex) {
+        throw ex
+      } finally {
+        if (original) Object.getOwnPropertySymbols = original
+      }
+    })
+
+    it('does not return inherited property identifiers', () => {
+      let e = new EventEmitter()
+
+      function Collection() {}
+      Collection.prototype.foo = () => {
+        return 'foo'
+      }
+
+      e._events = new Collection()
+
+      assume(e._events.foo()).equal('foo')
+      assume(e.eventNames()).eql([])
+    })
+
+    if ('undefined' !== typeof Symbol) it('includes ES6 symbols', () => {
+      let e = new EventEmitter()
+      let s = Symbol('s')
+
+      function foo() {}
+
+      e.on('foo', foo)
+      e.on(s, () => {})
+
+      assume(e.eventNames()).eql(['foo', s])
+      e.removeListener('foo', foo)
+      assume(e.eventNames()).eql([s])
+    })
+  })
 });
