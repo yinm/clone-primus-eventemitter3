@@ -199,6 +199,22 @@ describe('EventEmitter', () => {
       assume(called).equals(1)
     })
 
+    it('receives the emitted events', (done) => {
+      let e = new EventEmitter()
+
+      e.on('data', function(a, b, c, d, undef) {
+        assume(a).equals('foo')
+        assume(b).equals(e)
+        assume(c).is.instanceOf(Date)
+        assume(undef).equals(undefined)
+        assume(arguments.length).equals(3)
+
+        done()
+      })
+
+      e.emit('data', 'foo', e, new Date())
+    })
+
   })
 
 })
