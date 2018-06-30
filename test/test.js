@@ -336,6 +336,20 @@ describe('EventEmitter', function tests() {
       assume(calls).equals(1)
     })
 
+    it('only emits once if emits are nested inside the listener', () => {
+      let e = new EventEmitter()
+      let calls = 0
+
+      e.once('foo', () => {
+        calls++
+        e.emit('foo')
+      })
+
+      e.emit('foo')
+      assume(e.listeners('foo').length).equals(0)
+      assume(calls).equals(1)
+    })
+
   })
 
 });
