@@ -290,4 +290,18 @@ describe('EventEmitter', function tests() {
     })
   })
 
+  describe('EventEmitter#listenerCount', () => {
+    it('returns the number of listeners for a given event', () => {
+      let e = new EventEmitter()
+
+      assume(e.listenerCount()).equals(0)
+      assume(e.listenerCount('foo')).equals(0)
+
+      e.on('foo', () => {})
+      assume(e.listenerCount('foo')).equals(1)
+      e.on('foo', () => {})
+      assume(e.listenerCount('foo')).equals(2)
+    })
+  })
+
 });
