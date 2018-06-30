@@ -186,6 +186,19 @@ describe('EventEmitter', () => {
       assume(pattern).equals('foobazbarbanana')
     })
 
+    it('should return true when there are events to emit', () => {
+      let e = new EventEmitter()
+      let called = 0
+
+      e.on('foo', () => {
+        called++
+      })
+
+      assume(e.emit('foo')).equals(true)
+      assume(e.emit('foob')).equals(false)
+      assume(called).equals(1)
+    })
+
   })
 
 })
