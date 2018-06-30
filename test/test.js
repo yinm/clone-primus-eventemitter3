@@ -606,6 +606,19 @@ describe('EventEmitter', function tests() {
       }
     })
 
-  })
+    it('does not return inherited property identifiers', () => {
+      let e = new EventEmitter()
 
+      function Collection() {}
+      Collection.prototype.foo = () => {
+        return 'foo'
+      }
+
+      e._events = new Collection()
+
+      assume(e._events.foo()).equal('foo')
+      assume(e.eventNames()).eql([])
+    })
+
+  })
 });
