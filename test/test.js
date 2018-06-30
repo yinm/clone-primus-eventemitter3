@@ -577,6 +577,35 @@ describe('EventEmitter', function tests() {
       assume(e.eventNames()).eql([])
     })
 
+    it('returns an array listing the events that have listeners', () => {
+      let e = new EventEmitter()
+      let original
+
+      function bar() {}
+
+      if (Object.getOwnPropertySymbols) {
+        /**
+         * Monkey patch `Object.getOwnPropertySymbols()` to increase coverage
+         * on Node.js > 0.10.
+         */
+        original = Object.getOwnPropertySymbols
+        Object.getOwnPropertySymbols = undefined
+      }
+
+      e.on('foo', () => {})
+      e.on('bar', bar)
+
+      try {
+        assume(e.eventNames()).eql(['foo', 'bar'])
+        e.removeListener('bar', bar)
+        assume(e.eventNames()).eql(['foo'])
+      } catch (ex) {
+        throw ex
+      } finally {
+        if (original) Object.getOwnPropertySymbols = original
+      }
+    })
+
   })
 
 });
