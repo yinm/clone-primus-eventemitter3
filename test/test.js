@@ -520,4 +520,31 @@ describe('EventEmitter', function tests() {
     })
   })
 
+  describe('EventEmitter#removeAllListeners', () => {
+    it('removes all events for the specified events', () => {
+      let e = new EventEmitter()
+
+      e.on('foo', () => { throw new Error('oops') })
+      e.on('foo', () => { throw new Error('oops') })
+      e.on('bar', () => { throw new Error('oops') })
+      e.on('aaa', () => { throw new Error('oops') })
+
+      assume(e.removeAllListeners('foo')).equals(e)
+      assume(e.listeners('foo').length).equals(0)
+      assume(e.listeners('bar').length).equals(1)
+      assume(e.listeners('aaa').length).equals(1)
+      assume(e._eventsCount).equals(2)
+
+      assume(e.removeAllListeners('bar')).equals(e)
+      assume(e._eventsCount).equals(1)
+      assume(e.removeAllListeners('aaa')).equals(e)
+      assume(e._eventsCount).equals(0)
+
+      assume(e.emit('foo')).equals(false)
+      assume(e.emit('bar')).equals(false)
+      assume(e.emit('aaa')).equals(false)
+    })
+
+  })
+
 });
