@@ -565,4 +565,18 @@ describe('EventEmitter', function tests() {
     })
   })
 
+  describe('EventEmitter#eventNames', () => {
+    it('returns an empty array when there are no events', () => {
+      let e = new EventEmitter()
+
+      assume(e.eventNames()).eql([])
+
+      e.on('foo', () => {})
+      e.removeAllListeners('foo')
+
+      assume(e.eventNames()).eql([])
+    })
+
+  })
+
 });
