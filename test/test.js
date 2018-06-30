@@ -304,4 +304,20 @@ describe('EventEmitter', function tests() {
     })
   })
 
+  describe('EventEmitter#on', () => {
+    it('throws an error if the listener is not a function', () => {
+      let e = new EventEmitter()
+
+      try {
+        e.on('foo', 'bar')
+      } catch (ex) {
+        assume(ex).is.instanceOf(TypeError)
+        assume(ex.message).equals('The listener must be a function')
+        return
+      }
+
+      throw new Error('oops')
+    })
+  })
+
 });
