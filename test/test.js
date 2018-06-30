@@ -350,6 +350,36 @@ describe('EventEmitter', function tests() {
       assume(calls).equals(1)
     })
 
+    it('only emits once for multiple events', () => {
+      let e = new EventEmitter()
+      let multi = 0
+      let foo = 0
+      let bar = 0
+
+      e.once('foo', () => {
+        foo++
+      })
+
+      e.once('foo', () => {
+        bar++
+      })
+
+      e.on('foo', () => {
+        multi++
+      })
+
+      e.emit('foo')
+      e.emit('foo')
+      e.emit('foo')
+      e.emit('foo')
+      e.emit('foo')
+
+      assume(e.listeners('foo').length).equals(1)
+      assume(multi).equals(5)
+      assume(foo).equals(1)
+      assume(bar).equals(1)
+    })
+
   })
 
 });
