@@ -480,6 +480,44 @@ describe('EventEmitter', function tests() {
       assume(e._eventsCount).equals(0)
     })
 
+    it('removes only the listeners matching the correct context', () => {
+      const context = { foo: 'bar' }
+      let e = new EventEmitter()
+
+      function foo() {}
+      function bar() {}
+
+      e.on('foo', foo, context)
+
+      assume(e.removeListener('foo', () => {}, context)).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, { baz: 'quux' })).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, context)).equals(e)
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(0)
+
+      e.on('foo', foo, context)
+      e.on('foo', bar)
+
+      assume(e.removeListener('foo', foo, { baz: 'quux' })).equals(e)
+      assume(e.listeners('foo')).eql([foo, bar])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, context)).equals(e)
+      assume(e.listeners('foo')).eql([bar])
+      assume(e._eventsCount).equals(1)
+
+      e.on('foo', bar, context)
+
+      assume(e.removeListener('foo', bar)).equals(e)
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(0)
+    })
   })
 
 });
