@@ -380,6 +380,17 @@ describe('EventEmitter', function tests() {
       assume(bar).equals(1)
     })
 
+    it('only emits once with context', (done) => {
+      const context = { foo: 'bar' }
+      let e = new EventEmitter()
+
+      e.once('foo', function(bar) {
+        assume(this).equals(context)
+        assume(bar).equals('bar')
+
+        done()
+      }, context).emit('foo', 'bar')
+    })
   })
 
 });
