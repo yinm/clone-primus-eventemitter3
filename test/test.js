@@ -404,6 +404,45 @@ describe('EventEmitter', function tests() {
       assume(e.listeners('foo')).eql([])
     })
 
+    it('removes only the listeners matching the specified listener', () => {
+      let e = new EventEmitter()
+
+      function foo() {}
+      function bar() {}
+      function baz() {}
+
+      e.on('foo', foo)
+      e.on('bar', bar)
+      e.on('bar', baz)
+
+      assume(e.removeListener('foo', bar)).equals(e)
+      assume(e.listeners('bar')).eql([bar, baz])
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(2)
+
+      assume(e.removeListener('foo', foo)).equals(e)
+      assume(e.listeners('bar')).eql([bar, baz])
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('bar', bar)).equals(e)
+      assume(e.listeners('bar')).eql([baz])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('bar', baz)).equals(e)
+      assume(e.listeners('bar')).eql([])
+      assume(e._eventsCount).equals(0)
+
+      e.on('foo', foo)
+      e.on('foo', foo)
+      e.on('bar', bar)
+
+      assume(e.removeListener('foo', foo)).equals(e)
+      assume(e.listeners('bar')).eql([bar])
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(1)
+    })
+
   })
 
 });
