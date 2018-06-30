@@ -265,6 +265,17 @@ describe('EventEmitter', function tests() {
       assume(e.listeners('foo').length).equals(0)
     })
 
+    it('returns an array of function', () => {
+      let e = new EventEmitter()
+
+      function foo() {}
+
+      e.on('foo', foo)
+      assume(e.listeners('foo')).is.a('array')
+      assume(e.listeners('foo').length).equals(1)
+      assume(e.listeners('foo')).deep.equals([foo])
+    })
+
   })
 
 });
