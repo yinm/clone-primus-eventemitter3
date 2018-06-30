@@ -232,6 +232,30 @@ describe('EventEmitter', () => {
       assume(pattern.join(';')).equals('foo1;foo2')
     })
 
+    (function each(keys) {
+      let key = keys.shift()
+
+      if (!key) return
+
+      it(`can store event which is a known property ${key}`, function(next) {
+        let e = new EventEmitter()
+
+        e.on(key, function(k) {
+          assume(k).equals(key)
+          next()
+        }).emit(key, key)
+      })
+
+      each(keys)
+    })([
+      'hasOwnProperty',
+      'constructor',
+      '__proto__',
+      'toString',
+      'toValue',
+      'unwatch',
+      'watch'
+    ])
   })
 
 })
