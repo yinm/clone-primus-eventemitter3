@@ -215,6 +215,23 @@ describe('EventEmitter', () => {
       e.emit('data', 'foo', e, new Date())
     })
 
+    it('emits to all event listeners', () => {
+      let e = new EventEmitter()
+      let pattern = []
+
+      e.on('foo', () => {
+        pattern.push('foo1')
+      })
+
+      e.on('foo', () => {
+        pattern.push('foo2')
+      })
+
+      e.emit('foo')
+
+      assume(pattern.join(';')).equals('foo1;foo2')
+    })
+
   })
 
 })
