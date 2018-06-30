@@ -443,6 +443,43 @@ describe('EventEmitter', function tests() {
       assume(e._eventsCount).equals(1)
     })
 
+    it('removes only the once listeners when using the once flag', () => {
+      let e = new EventEmitter()
+
+      function foo() {}
+
+      e.on('foo', foo)
+
+      assume(e.removeListener('foo', () => {}, undefined, true)).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, undefined, true)).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo)).equals(e)
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(0)
+
+      e.once('foo', foo)
+      e.on('foo', foo)
+
+      assume(e.removeListener('foo', () => {}, undefined, true)).equals(e)
+      assume(e.listeners('foo')).eql([foo, foo])
+      assume(e._eventsCount).equals(1)
+
+      assume(e.removeListener('foo', foo, undefined, true)).equals(e)
+      assume(e.listeners('foo')).eql([foo])
+      assume(e._eventsCount).equals(1)
+
+      e.once('foo', foo)
+
+      assume(e.removeListener('foo', foo)).equal(e)
+      assume(e.listeners('foo')).eql([])
+      assume(e._eventsCount).equals(0)
+    })
+
   })
 
 });
