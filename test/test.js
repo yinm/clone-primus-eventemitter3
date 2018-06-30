@@ -256,4 +256,15 @@ describe('EventEmitter', function tests() {
       'watch'
     ]);
   });
+
+  describe('EventEmitter#listeners', () => {
+    it('returns an empty if no listeners are specified', () => {
+      let e = new EventEmitter()
+
+      assume(e.listeners('foo')).is.a('array')
+      assume(e.listeners('foo').length).equals(0)
+    })
+
+  })
+
 });
