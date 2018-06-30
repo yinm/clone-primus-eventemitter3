@@ -320,4 +320,22 @@ describe('EventEmitter', function tests() {
     })
   })
 
+  describe('EventEmitter#once', () => {
+    it('only emits it once', () => {
+      let e = new EventEmitter()
+      let calls = 0
+
+      e.once('foo', () => {
+        calls++
+      })
+
+      e.emit('foo')
+      e.emit('foo')
+
+      assume(e.listeners('foo').length).equals(0)
+      assume(calls).equals(1)
+    })
+
+  })
+
 });
