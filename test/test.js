@@ -276,6 +276,18 @@ describe('EventEmitter', function tests() {
       assume(e.listeners('foo')).deep.equals([foo])
     })
 
+    it('is not vulnerable to modifications', () => {
+      let e = new EventEmitter()
+
+      function foo() {}
+
+      e.on('foo', foo)
+
+      assume(e.listeners('foo')).deep.equals([foo])
+
+      e.listeners('foo').length = 0
+      assume(e.listeners('foo')).deep.equals([foo])
+    })
   })
 
 });
